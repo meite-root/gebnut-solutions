@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Geb & Nut</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div class="brand">Geb &amp; Nut</div>
+      <nav class="nav">
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">Simple. Useful. Well-made.</p>
+      <h1>Premium everyday essentials,<br/>done with taste.</h1>
+      <p class="sub">
+        Geb &amp; Nut is building practical products and experiences that feel quietly luxurious.
+      </p>
+      <div class="cta">
+        <a class="btn" href="#contact">Work with us</a>
+        <a class="btn ghost" href="#about">Learn more</a>
+      </div>
+    </section>
+
+    <section id="about" class="card">
+      <h2>What we do</h2>
+      <p>
+        We partner with businesses to create branded, high-quality essentials that people actually keep.
+        Clean design, strong execution, and zero gimmicks (okay, maybe one tasteful gimmick).
+      </p>
+      <ul class="bullets">
+        <li>Branded everyday items</li>
+        <li>Distribution & partnerships</li>
+        <li>Product + campaign concepts</li>
+      </ul>
+    </section>
+
+    <section id="contact" class="card">
+      <h2>Contact</h2>
+      <p>Email us and we’ll reply fast (unless we’re out doing field research… aka buying snacks).</p>
+      <p class="contact">
+        <a href="mailto:hello@YOURDOMAIN.com">hello@YOURDOMAIN.com</a>
+      </p>
+    </section>
+
+    <footer class="footer">
+      <span>© <span id="y"></span> Geb &amp; Nut</span>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
