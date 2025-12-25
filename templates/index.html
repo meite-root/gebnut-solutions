@@ -3,59 +3,132 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Geb & Nut</title>
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
-<body>
-  <main class="wrap">
-    <header class="top">
-      <div class="brand">Geb &amp; Nut</div>
-      <nav class="nav">
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
+  <title>Geb & Nut — Solutions</title>
+  <meta name="description" content="Geb & Nut builds practical, elegant solutions — from idea to execution." />
 
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script defer src="/static/main.js"></script>
+</head>
+
+<body>
+  <header class="header">
+    <nav class="nav">
+      <div class="brand">Geb<span>&</span>Nut</div>
+      <div class="navlinks">
+        <a href="#services">Services</a>
+        <a href="#work">How we work</a>
+        <a href="#contact" class="btn btn--ghost">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
     <section class="hero">
-      <p class="eyebrow">Simple. Useful. Well-made.</p>
-      <h1>Premium everyday essentials,<br/>done with taste.</h1>
-      <p class="sub">
-        Geb &amp; Nut is building practical products and experiences that feel quietly luxurious.
-      </p>
-      <div class="cta">
-        <a class="btn" href="#contact">Work with us</a>
-        <a class="btn ghost" href="#about">Learn more</a>
+      <div class="hero__bg"></div>
+
+      <div class="hero__content">
+        <p class="kicker">Partner-led venture</p>
+        <h1>Simple. Classy. Effective.</h1>
+        <p class="sub">
+          Geb & Nut helps teams turn messy problems into clean outcomes —
+          with strategy, execution, and taste.
+        </p>
+
+        <div class="cta">
+          <a class="btn" href="#contact">Request a call</a>
+          <a class="btn btn--ghost" href="#services">See services</a>
+        </div>
+
+        <div class="trust">
+          <div class="pill">Fast turnaround</div>
+          <div class="pill">Clear communication</div>
+          <div class="pill">High standards</div>
+        </div>
       </div>
     </section>
 
-    <section id="about" class="card">
-      <h2>What we do</h2>
-      <p>
-        We partner with businesses to create branded, high-quality essentials that people actually keep.
-        Clean design, strong execution, and zero gimmicks (okay, maybe one tasteful gimmick).
-      </p>
-      <ul class="bullets">
-        <li>Branded everyday items</li>
-        <li>Distribution & partnerships</li>
-        <li>Product + campaign concepts</li>
-      </ul>
+    <section id="services" class="section">
+      <div class="section__head">
+        <h2>What we do</h2>
+        <p>Focused offers. No fluff. (Fluff is for pillows, not deliverables.)</p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <h3>Web & automation</h3>
+          <p>Landing pages, internal tools, and streamlined workflows that actually ship.</p>
+        </article>
+
+        <article class="card">
+          <h3>Data & analytics</h3>
+          <p>Dashboards, evaluation, and decision support that’s readable and reliable.</p>
+        </article>
+
+        <article class="card">
+          <h3>Strategy & ops</h3>
+          <p>Clarify priorities, reduce chaos, and execute with a crisp operating rhythm.</p>
+        </article>
+      </div>
     </section>
 
-    <section id="contact" class="card">
-      <h2>Contact</h2>
-      <p>Email us and we’ll reply fast (unless we’re out doing field research… aka buying snacks).</p>
-      <p class="contact">
-        <a href="mailto:hello@YOURDOMAIN.com">hello@YOURDOMAIN.com</a>
-      </p>
+    <section id="work" class="section section--alt">
+      <div class="section__head">
+        <h2>How we work</h2>
+        <p>A calm process that protects your time and your sanity.</p>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <span class="stepnum">01</span>
+          <div>
+            <h3>Quick discovery</h3>
+            <p>We define the goal, constraints, and what “done” means.</p>
+          </div>
+        </li>
+        <li>
+          <span class="stepnum">02</span>
+          <div>
+            <h3>Build the first version</h3>
+            <p>We ship a clean v1 fast, then iterate with feedback.</p>
+          </div>
+        </li>
+        <li>
+          <span class="stepnum">03</span>
+          <div>
+            <h3>Polish & deploy</h3>
+            <p>Production-ready, secure, and maintainable.</p>
+          </div>
+        </li>
+      </ol>
     </section>
 
-    <footer class="footer">
-      <span>© <span id="y"></span> Geb &amp; Nut</span>
-    </footer>
+    <section id="contact" class="section">
+      <div class="section__head">
+        <h2>Contact</h2>
+        <p>Drop a message and we’ll respond with next steps.</p>
+      </div>
+
+      <!-- Simple mailto for v1. Later we can add a real POST endpoint. -->
+      <div class="contact">
+        <div class="contact__box">
+          <h3>Email</h3>
+          <p><a href="mailto:hello@YOUR_DOMAIN.com">hello@YOUR_DOMAIN.com</a></p>
+          <p class="muted">Replace with your real address/domain.</p>
+        </div>
+
+        <div class="contact__box">
+          <h3>Availability</h3>
+          <p>Short projects, ongoing retainers, and “save us this week” missions.</p>
+          <p class="muted">We’re friendly. Our timelines are not negotiable with chaos.</p>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <span>© <span id="year"></span> Geb & Nut</span>
+        <span class="dot">•</span>
+        <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'})">Back to top</a>
+      </footer>
+    </section>
   </main>
-
-  <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
-  </script>
 </body>
 </html>
