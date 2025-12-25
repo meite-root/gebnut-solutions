@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scratch to Reveal</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    /* page-specific styling */
+    .scratch-wrap{
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 56px 18px;
+    }
+    .scratch-card{
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.04);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.45);
+    }
+    .scratch-head{
+      padding: 18px 18px 8px;
+    }
+    .scratch-head h1{
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+    .scratch-head p{
+      margin: 0;
+      color: rgba(255,255,255,0.70);
+      line-height: 1.5;
+    }
+
+    .scratch-stage{
+      position: relative;
+      aspect-ratio: 1.6 / 1; /* nice “card” ratio */
+      background: rgba(0,0,0,0.15);
+    }
+    .scratch-stage img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    canvas#scratch{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none; /* important for mobile */
+      cursor: crosshair;
+    }
+
+    .scratch-footer{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content: space-between;
+      padding: 14px 18px 18px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.70);
+      font-size: 13px;
+    }
+    .mini-btn{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.9);
+      cursor: pointer;
+    }
+    .mini-btn:hover{ background: rgba(255,255,255,0.10); }
+
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+    }
+    .dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: rgba(255,255,255,0.45);
+    }
+
+    .reveal-message{
+      padding: 14px 18px 0;
+      color: rgba(255,255,255,0.80);
+      display:none;
+    }
+    .reveal-message.show{ display:block; }
+  </style>
+</head>
+
+<body style="background:#0b0d12; color:rgba(255,255,255,0.92); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;">
+  <div class="scratch-wrap">
+    <div class="scratch-card">
+      <div class="scratch-head">
+        <h1>Scratch to reveal your prize</h1>
+        <p>Scratch the gray area to uncover what you’re about to win.</p>
+      </div>
+
+      <div class="scratch-stage">
+        <!-- Prize image underneath -->
+        <img id="prizeImg" src="/static/products/umbrella.jpg" alt="Prize image" />
+        <!-- Gray overlay canvas on top -->
+        <canvas id="scratch" aria-label="Scratch area"></canvas>
+      </div>
+
+      <div id="revealMsg" class="reveal-message">
+        🎁 Revealed! Tap “Reset” to try again.
+      </div>
+
+      <div class="scratch-footer">
+        <span class="badge"><span class="dot"></span><span id="progressText">0% revealed</span></span>
+        <button class="mini-btn" id="resetBtn" type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const canvas = document.getElementById("scratch");
+      const img = document.getElementById("prizeImg");
+      const resetBtn = document.getElementById("resetBtn");
+      const progressText = document.getElementById("progressText");
+      const revealMsg = document.getElementById("revealMsg");
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+      // Tweak these for “feel”
+      const BRUSH_RADIUS = 22;      // scratch size
+      const REVEAL_THRESHOLD = 0.55; // 55% scratched => “revealed”
+
+      let isDown = false;
+      let lastPoint = null;
+
+      function resizeCanvasToDisplaySize(){
+        // match internal canvas pixels to displayed size (sharp on retina)
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const w = Math.max(1, Math.floor(rect.width * dpr));
+        const h = Math.max(1, Math.floor(rect.height * dpr));
+
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.scale(dpr, dpr); // draw in CSS pixels
+      }
+
+      function drawOverlay(){
+        const rect = canvas.getBoundingClientRect();
+        ctx.globalCompositeOperation = "source-over";
+
+        // a classy gray gradient + subtle noise-like pattern
+        const g = ctx.createLinearGradient(0, 0, rect.width, rect.height);
+        g.addColorStop(0, "rgba(255,255,255,0.32)");
+        g.addColorStop(1, "rgba(255,255,255,0.18)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, rect.width, rect.height);
+
+        // optional “scratch” label
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("SCRATCH HERE", rect.width/2, rect.height/2);
+
+        ctx.globalCompositeOperation = "destination-out";
+        revealMsg.classList.remove("show");
+        progressText.textContent = "0% revealed";
+      }
+
+      function getPoint(e){
+        const rect = canvas.getBoundingClientRect();
+        const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+        return { x: p.clientX - rect.left, y: p.clientY - rect.top };
+      }
+
+      function scratchLine(from, to){
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(0,0,0,1)";
+        ctx.lineWidth = BRUSH_RADIUS * 2;
+
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+      }
+
+      function scratchDot(p){
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, BRUSH_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function estimateRevealed(){
+        // sample the alpha channel and estimate cleared pixels
+        // (quick and good enough for UX gating)
+        const rect = canvas.getBoundingClientRect();
+        const imgData = ctx.getImageData(0, 0, Math.floor(rect.width), Math.floor(rect.height)).data;
+
+        let cleared = 0;
+        const total = imgData.length / 4;
+
+        // count pixels where alpha is near 0
+        for (let i = 3; i < imgData.length; i += 4) {
+          if (imgData[i] < 20) cleared++;
+        }
+
+        const ratio = cleared / total;
+        const pct = Math.round(ratio * 100);
+        progressText.textContent = pct + "% revealed";
+
+        if (ratio >= REVEAL_THRESHOLD) {
+          revealMsg.classList.add("show");
+          // optional: clear the rest for a satisfying “pop”
+          ctx.clearRect(0, 0, rect.width, rect.height);
+        }
+      }
+
+      function onDown(e){
+        isDown = true;
+        lastPoint = getPoint(e);
+        ctx.globalCompositeOperation = "destination-out";
+        scratchDot(lastPoint);
+        estimateRevealed();
+      }
+
+      function onMove(e){
+        if (!isDown) return;
+        const p = getPoint(e);
+        scratchLine(lastPoint, p);
+        lastPoint = p;
+        // throttle-ish: estimate occasionally
+        if (Math.random() < 0.20) estimateRevealed();
+      }
+
+      function onUp(){
+        if (!isDown) return;
+        isDown = false;
+        lastPoint = null;
+        estimateRevealed();
+      }
+
+      function init(){
+        resizeCanvasToDisplaySize();
+        drawOverlay();
+
+        canvas.addEventListener("mousedown", onDown);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onUp);
+
+        canvas.addEventListener("touchstart", (e) => { e.preventDefault(); onDown(e); }, { passive:false });
+        canvas.addEventListener("touchmove", (e) => { e.preventDefault(); onMove(e); }, { passive:false });
+        canvas.addEventListener("touchend", (e) => { e.preventDefault(); onUp(e); }, { passive:false });
+
+        resetBtn.addEventListener("click", () => {
+          resizeCanvasToDisplaySize();
+          drawOverlay();
+        });
+
+        window.addEventListener("resize", () => {
+          // keep overlay aligned if the card resizes
+          resizeCanvasToDisplaySize();
+          drawOverlay();
+        });
+      }
+
+      // wait for image to load so layout is stable
+      if (img.complete) init();
+      else img.addEventListener("load", init);
+    })();
+  </script>
+</body>
+</html>

@@ -6,6 +6,9 @@ app = Flask(__name__)
 def home():
     return render_template("index.html")
 
+@app.get("/client/scratch")
+def client_scratch():
+    return render_template("scratch.html")
+
 if __name__ == "__main__":
-    # local dev only
     app.run(host="127.0.0.1", port=5000, debug=True)
