@@ -201,3 +201,113 @@ h1{
   .grid{ grid-template-columns: 1fr; }
   .contact{ grid-template-columns: 1fr; }
 }
+
+
+/* ===== Product Carousel ===== */
+.carousel{
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel2);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.carousel__top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.carousel__controls{
+  display:flex;
+  gap:10px;
+}
+
+.iconbtn{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.iconbtn:hover{ background: rgba(255,255,255,0.10); }
+
+.carousel__track{
+  display:grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 14px;
+
+  overflow-x: auto;
+  padding: 6px 2px 12px;
+
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+.carousel__track::-webkit-scrollbar{ display:none; }
+
+.pcard{
+  scroll-snap-align: start;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(0,0,0,0.18);
+  overflow:hidden;
+  min-height: 320px;
+}
+
+.pimg{
+  height: 170px;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+
+.pbody{
+  padding: 14px;
+}
+.pbody h3{ margin: 0 0 6px; font-size: 18px; }
+.pbody p{ margin: 0; color: var(--muted); line-height: 1.55; }
+
+.ptags{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tag{
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.78);
+}
+
+.carousel__dots{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-top: 10px;
+}
+.dotbtn{
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.20);
+  background: rgba(255,255,255,0.10);
+  cursor:pointer;
+}
+.dotbtn[aria-current="true"]{
+  background: rgba(255,255,255,0.60);
+}
