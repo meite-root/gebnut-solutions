@@ -4,40 +4,60 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Scratch to Reveal</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+
   <style>
-    /* page-specific styling */
+    :root{
+      --bg: #0b0d12;
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.70);
+      --line: rgba(255,255,255,0.12);
+      --panel: rgba(255,255,255,0.05);
+      --shadow: 0 18px 45px rgba(0,0,0,0.45);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    a{ color:inherit; }
+
     .scratch-wrap{
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto;
       padding: 56px 18px;
     }
+
     .scratch-card{
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid var(--line);
       border-radius: 18px;
       overflow: hidden;
-      background: rgba(255,255,255,0.04);
-      box-shadow: 0 18px 45px rgba(0,0,0,0.45);
+      background: rgba(255,255,255,0.035);
+      box-shadow: var(--shadow);
     }
+
     .scratch-head{
-      padding: 18px 18px 8px;
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
     }
+
     .scratch-head h1{
       font-size: 22px;
       margin: 0 0 6px;
     }
+
     .scratch-head p{
       margin: 0;
-      color: rgba(255,255,255,0.70);
+      color: var(--muted);
       line-height: 1.5;
     }
 
     .scratch-stage{
       position: relative;
-      aspect-ratio: 1.6 / 1; /* nice “card” ratio */
+      aspect-ratio: 1.6 / 1;
       background: rgba(0,0,0,0.15);
     }
+
     .scratch-stage img{
       width: 100%;
       height: 100%;
@@ -57,6 +77,13 @@
       cursor: crosshair;
     }
 
+    .reveal-message{
+      padding: 12px 18px 0;
+      color: rgba(255,255,255,0.86);
+      display:none;
+    }
+    .reveal-message.show{ display:block; }
+
     .scratch-footer{
       display:flex;
       gap: 10px;
@@ -64,18 +91,9 @@
       justify-content: space-between;
       padding: 14px 18px 18px;
       border-top: 1px solid rgba(255,255,255,0.10);
-      color: rgba(255,255,255,0.70);
+      color: var(--muted);
       font-size: 13px;
     }
-    .mini-btn{
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.9);
-      cursor: pointer;
-    }
-    .mini-btn:hover{ background: rgba(255,255,255,0.10); }
 
     .badge{
       display:inline-flex;
@@ -87,16 +105,19 @@
       background: rgba(255,255,255,0.45);
     }
 
-    .reveal-message{
-      padding: 14px 18px 0;
-      color: rgba(255,255,255,0.80);
-      display:none;
+    .mini-btn{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.9);
+      cursor: pointer;
     }
-    .reveal-message.show{ display:block; }
+    .mini-btn:hover{ background: rgba(255,255,255,0.10); }
   </style>
 </head>
 
-<body style="background:#0b0d12; color:rgba(255,255,255,0.92); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;">
+<body>
   <div class="scratch-wrap">
     <div class="scratch-card">
       <div class="scratch-head">
@@ -106,17 +127,20 @@
 
       <div class="scratch-stage">
         <!-- Prize image underneath -->
-        <img id="prizeImg" src="/static/products/umbrella.png" alt="Prize image" />
+        <img id="prizeImg" src="/static/products/umbrella.jpg" alt="Prize image" />
         <!-- Gray overlay canvas on top -->
         <canvas id="scratch" aria-label="Scratch area"></canvas>
       </div>
 
       <div id="revealMsg" class="reveal-message">
-        🎁 Revealed! Tap “Reset” to try again.
+        🎁 Revealed!
       </div>
 
       <div class="scratch-footer">
-        <span class="badge"><span class="dot"></span><span id="progressText">0% revealed</span></span>
+        <span class="badge">
+          <span class="dot"></span>
+          <span id="progressText">0% revealed</span>
+        </span>
         <button class="mini-btn" id="resetBtn" type="button">Reset</button>
       </div>
     </div>
@@ -132,17 +156,18 @@
 
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-      // Tweak these for “feel”
-      const BRUSH_RADIUS = 22;      // scratch size
-      const REVEAL_THRESHOLD = 0.55; // 55% scratched => “revealed”
+      // ===== Feel tuning =====
+      const BRUSH_RADIUS = 22;        // scratch size
+      const REVEAL_THRESHOLD = 0.10;  // 10%
 
       let isDown = false;
       let lastPoint = null;
+      let revealed = false;
 
       function resizeCanvasToDisplaySize(){
-        // match internal canvas pixels to displayed size (sharp on retina)
         const rect = canvas.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
+
         const w = Math.max(1, Math.floor(rect.width * dpr));
         const h = Math.max(1, Math.floor(rect.height * dpr));
 
@@ -150,29 +175,36 @@
           canvas.width = w;
           canvas.height = h;
         }
+
+        // draw in CSS pixels
         ctx.setTransform(1,0,0,1,0,0);
-        ctx.scale(dpr, dpr); // draw in CSS pixels
+        ctx.scale(dpr, dpr);
       }
 
       function drawOverlay(){
         const rect = canvas.getBoundingClientRect();
+
         ctx.globalCompositeOperation = "source-over";
 
-        // a classy gray gradient + subtle noise-like pattern
+        // classy gray overlay (slight gradient)
         const g = ctx.createLinearGradient(0, 0, rect.width, rect.height);
         g.addColorStop(0, "rgba(255,255,255,0.32)");
         g.addColorStop(1, "rgba(255,255,255,0.18)");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, rect.width, rect.height);
 
-        // optional “scratch” label
+        // label
         ctx.fillStyle = "rgba(0,0,0,0.22)";
         ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("SCRATCH HERE", rect.width/2, rect.height/2);
 
+        // switch into erase mode for scratching
         ctx.globalCompositeOperation = "destination-out";
+
+        // reset UI
+        revealed = false;
         revealMsg.classList.remove("show");
         progressText.textContent = "0% revealed";
       }
@@ -202,15 +234,18 @@
       }
 
       function estimateRevealed(){
-        // sample the alpha channel and estimate cleared pixels
-        // (quick and good enough for UX gating)
         const rect = canvas.getBoundingClientRect();
-        const imgData = ctx.getImageData(0, 0, Math.floor(rect.width), Math.floor(rect.height)).data;
+
+        // IMPORTANT: use the canvas pixel size for reading, but we scaled drawing to CSS pixels.
+        // Since we scaled ctx with dpr, rect.width/height correspond to CSS pixels, which matches our draw coords.
+        const w = Math.floor(rect.width);
+        const h = Math.floor(rect.height);
+
+        const imgData = ctx.getImageData(0, 0, w, h).data;
 
         let cleared = 0;
         const total = imgData.length / 4;
 
-        // count pixels where alpha is near 0
         for (let i = 3; i < imgData.length; i += 4) {
           if (imgData[i] < 20) cleared++;
         }
@@ -219,28 +254,26 @@
         const pct = Math.round(ratio * 100);
         progressText.textContent = pct + "% revealed";
 
-        if (ratio >= REVEAL_THRESHOLD) {
+        if (!revealed && ratio >= REVEAL_THRESHOLD) {
+          revealed = true;
           revealMsg.classList.add("show");
-          // optional: clear the rest for a satisfying “pop”
-          ctx.clearRect(0, 0, rect.width, rect.height);
         }
       }
 
       function onDown(e){
+        if (revealed) return; // optional: stop interaction after reveal
         isDown = true;
         lastPoint = getPoint(e);
-        ctx.globalCompositeOperation = "destination-out";
         scratchDot(lastPoint);
         estimateRevealed();
       }
 
       function onMove(e){
-        if (!isDown) return;
+        if (!isDown || revealed) return;
         const p = getPoint(e);
         scratchLine(lastPoint, p);
         lastPoint = p;
-        // throttle-ish: estimate occasionally
-        if (Math.random() < 0.20) estimateRevealed();
+        estimateRevealed(); // no randomness
       }
 
       function onUp(){
@@ -268,13 +301,11 @@
         });
 
         window.addEventListener("resize", () => {
-          // keep overlay aligned if the card resizes
           resizeCanvasToDisplaySize();
           drawOverlay();
         });
       }
 
-      // wait for image to load so layout is stable
       if (img.complete) init();
       else img.addEventListener("load", init);
     })();
