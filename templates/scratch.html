@@ -186,12 +186,12 @@
 
         ctx.globalCompositeOperation = "source-over";
 
-        // classy gray overlay (slight gradient)
-        const g = ctx.createLinearGradient(0, 0, rect.width, rect.height);
-        g.addColorStop(0, "rgba(255,255,255,0.32)");
-        g.addColorStop(1, "rgba(255,255,255,0.18)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, rect.width, rect.height);
+        // premium lottery ticket TEXTURE
+       const g = ctx.createLinearGradient(0, 0, rect.width, rect.height);
+       g.addColorStop(0, "#bfbfbf");
+       g.addColorStop(1, "#9a9a9a");
+       ctx.fillStyle = g;
+       ctx.fillRect(0, 0, rect.width, rect.height);
 
         // label
         ctx.fillStyle = "rgba(0,0,0,0.22)";
