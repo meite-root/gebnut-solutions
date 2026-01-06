@@ -189,7 +189,10 @@
         <a href="#">Rules, Terms, and Conditions</a>
         &nbsp;&nbsp;•&nbsp;&nbsp;
         <a href="#">Privacy</a>
+        &nbsp;&nbsp;•&nbsp;&nbsp;
+        <span>© <span id="year"></span> Geb &amp; Nut</span>
       </div>
+
     </div>
   </div>
 
@@ -426,5 +429,9 @@
       });
     })();
   </script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
 </body>
 </html>
