@@ -3,145 +3,192 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Scratch to Reveal</title>
+  <title>Scratch-off</title>
 
   <style>
     :root{
-      --bg: #0b0d12;
+      --bg: #2a0b12;
       --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.70);
-      --line: rgba(255,255,255,0.12);
-      --panel: rgba(255,255,255,0.05);
-      --shadow: 0 18px 45px rgba(0,0,0,0.45);
+      --muted: rgba(255,255,255,0.72);
+      --shadow: 0 18px 55px rgba(0,0,0,0.55);
+      --ring: rgba(255,255,255,0.18);
     }
-
     *{ box-sizing:border-box; }
-    html,body{ margin:0; padding:0; background:var(--bg); color:var(--text);
+    html,body{
+      margin:0; padding:0;
+      background: var(--bg);
+      color: var(--text);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
 
-    a{ color:inherit; }
+    /* subtle patterned background vibe (like the reference) */
+    .bg{
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 25% 10%, rgba(255,255,255,0.07), transparent 40%),
+        radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06), transparent 45%),
+        repeating-linear-gradient(45deg,
+          rgba(255,255,255,0.04) 0px,
+          rgba(255,255,255,0.04) 12px,
+          rgba(0,0,0,0.00) 12px,
+          rgba(0,0,0,0.00) 28px
+        ),
+        linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.20));
+    }
 
-    .scratch-wrap{
-      max-width: 560px;
+    .wrap{
+      max-width: 760px;
       margin: 0 auto;
-      padding: 56px 18px;
+      padding: 54px 18px 70px;
+      text-align:center;
     }
 
-    .scratch-card{
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.035);
-      box-shadow: var(--shadow);
-    }
-
-    .scratch-head{
-      padding: 18px 18px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-    }
-
-    .scratch-head h1{
-      font-size: 22px;
-      margin: 0 0 6px;
-    }
-
-    .scratch-head p{
+    .brand{
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 44px;
       margin: 0;
+      opacity: 0.92;
+    }
+    .subtitle{
+      margin: 10px 0 0;
       color: var(--muted);
-      line-height: 1.5;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .title2{
+      margin: 6px 0 30px;
+      color: rgba(255,255,255,0.78);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 18px;
     }
 
-    .scratch-stage{
+    .disk-area{
+      display:flex;
+      justify-content:center;
+      margin: 18px 0 18px;
+    }
+
+    /* The circular scratch “coin” */
+    .scratch-disk{
       position: relative;
-      aspect-ratio: 1.6 / 1;
-      background: rgba(0,0,0,0.15);
+      width: min(78vw, 420px);
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--ring);
+      background: rgba(0,0,0,0.22);
     }
 
-    .scratch-stage img{
+    /* prize is behind */
+    .scratch-disk img{
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
+      display:block;
       user-select: none;
       -webkit-user-drag: none;
+      filter: saturate(1.03) contrast(1.02);
     }
 
-    canvas#scratch{
+    /* canvas sits on top */
+    #scratch{
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      display: block;
-      touch-action: none; /* important for mobile */
-      cursor: crosshair;
+      display:block;
+      touch-action: none;
+      cursor: pointer;
     }
 
-    .reveal-message{
-      padding: 12px 18px 0;
-      color: rgba(255,255,255,0.86);
-      display:none;
-    }
-    .reveal-message.show{ display:block; }
-
-    .scratch-footer{
+    .below{
+      margin-top: 16px;
       display:flex;
-      gap: 10px;
       align-items:center;
-      justify-content: space-between;
-      padding: 14px 18px 18px;
-      border-top: 1px solid rgba(255,255,255,0.10);
+      justify-content:center;
+      gap: 12px;
+      flex-wrap: wrap;
       color: var(--muted);
       font-size: 13px;
     }
 
-    .badge{
+    .pill{
       display:inline-flex;
-      gap:8px;
+      gap:10px;
       align-items:center;
-    }
-    .dot{
-      width: 8px; height: 8px; border-radius: 999px;
-      background: rgba(255,255,255,0.45);
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.25);
     }
 
-    .mini-btn{
-      padding: 8px 12px;
+    .btn{
+      padding: 10px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.20);
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.92);
       cursor: pointer;
+      font-weight: 650;
+      letter-spacing: 0.02em;
     }
-    .mini-btn:hover{ background: rgba(255,255,255,0.10); }
+    .btn:hover{ background: rgba(255,255,255,0.14); }
+
+    .msg{
+      margin-top: 14px;
+      display:none;
+      color: rgba(255,255,255,0.90);
+      font-weight: 650;
+    }
+    .msg.show{ display:block; }
+
+    .links{
+      margin-top: 26px;
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+    }
+    .links a{ color: rgba(255,255,255,0.72); text-decoration:none; }
+    .links a:hover{ text-decoration:underline; }
   </style>
 </head>
 
 <body>
-  <div class="scratch-wrap">
-    <div class="scratch-card">
-      <div class="scratch-head">
-        <h1>Scratch to reveal your prize</h1>
-        <p>Scratch the gray area to uncover what you’re about to win.</p>
+  <div class="bg">
+    <div class="wrap">
+      <h1 class="brand">CLIENT NAME</h1>
+      <div class="subtitle">Customer engagement</div>
+      <div class="title2">Scratch-off game</div>
+
+      <div class="disk-area">
+        <div class="scratch-disk" aria-label="Scratch to reveal">
+          <!-- Prize image underneath -->
+          <img id="prizeImg" src="/static/scratch/prize.png" alt="Prize" />
+          <!-- Canvas overlay on top -->
+          <canvas id="scratch"></canvas>
+        </div>
       </div>
 
-      <div class="scratch-stage">
-        <!-- Prize image underneath -->
-        <img id="prizeImg" src="/static/products/umbrella.png" alt="Prize image" />
-        <!-- Gray overlay canvas on top -->
-        <canvas id="scratch" aria-label="Scratch area"></canvas>
-      </div>
+      <div id="revealMsg" class="msg">🎁 Revealed!</div>
 
-      <div id="revealMsg" class="reveal-message">
-        Revealed!
-      </div>
-
-      <div class="scratch-footer">
-        <span class="badge">
-          <span class="dot"></span>
+      <div class="below">
+        <div class="pill">
           <span id="progressText">0% revealed</span>
-        </span>
-        <button class="mini-btn" id="resetBtn" type="button">Reset</button>
+        </div>
+        <button class="btn" id="resetBtn" type="button">Reset</button>
+      </div>
+
+      <div class="links">
+        <a href="#">Rules, Terms, and Conditions</a>
+        &nbsp;&nbsp;•&nbsp;&nbsp;
+        <a href="#">Privacy</a>
       </div>
     </div>
   </div>
@@ -156,9 +203,15 @@
 
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-      // ===== Feel tuning =====
+      // ===== tuning =====
       const BRUSH_RADIUS = 22;        // scratch size
-      const REVEAL_THRESHOLD = 0.85;  // 85%
+      const REVEAL_THRESHOLD = 0.10;  // 10%
+      const LOCK_AFTER_REVEAL = true; // set false if you want scratching to continue
+
+      // ===== overlay asset (Option A) =====
+      const METAL_IMAGE_URL = "/static/scratch/metal.png";
+      const metalImg = new Image();
+      metalImg.src = METAL_IMAGE_URL;
 
       let isDown = false;
       let lastPoint = null;
@@ -167,43 +220,100 @@
       function resizeCanvasToDisplaySize(){
         const rect = canvas.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
-
         const w = Math.max(1, Math.floor(rect.width * dpr));
         const h = Math.max(1, Math.floor(rect.height * dpr));
-
         if (canvas.width !== w || canvas.height !== h) {
           canvas.width = w;
           canvas.height = h;
         }
-
         // draw in CSS pixels
         ctx.setTransform(1,0,0,1,0,0);
         ctx.scale(dpr, dpr);
       }
 
-      function drawOverlay(){
-        const rect = canvas.getBoundingClientRect();
-
+      function drawLabel(rect){
+        // This text is printed ON the overlay, so it scratches off too.
+        ctx.save();
         ctx.globalCompositeOperation = "source-over";
 
-        // premium lottery ticket TEXTURE
-       const g = ctx.createLinearGradient(0, 0, rect.width, rect.height);
-       g.addColorStop(0, "#bfbfbf");
-       g.addColorStop(1, "#9a9a9a");
-       ctx.fillStyle = g;
-       ctx.fillRect(0, 0, rect.width, rect.height);
-
-        // label
-        ctx.fillStyle = "rgba(0,0,0,0.22)";
-        ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+        // subtle shadow
+        ctx.fillStyle = "rgba(0,0,0,0.18)";
+        ctx.font = "800 28px system-ui, -apple-system, Segoe UI, Roboto, Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("SCRATCH HERE", rect.width/2, rect.height/2);
+        ctx.fillText("SCRATCH", rect.width/2 + 1, rect.height/2 - 22 + 1);
+        ctx.fillText("HERE", rect.width/2 + 1, rect.height/2 + 22 + 1);
 
-        // switch into erase mode for scratching
+        // main text
+        ctx.fillStyle = "rgba(0,0,0,0.78)";
+        ctx.fillText("SCRATCH", rect.width/2, rect.height/2 - 22);
+        ctx.fillText("HERE", rect.width/2, rect.height/2 + 22);
+
+        ctx.restore();
+      }
+
+      // Option B: generate “metal” if image is missing
+      function drawGeneratedMetal(rect){
+        // base
+        const g = ctx.createRadialGradient(
+          rect.width * 0.35, rect.height * 0.35, rect.width * 0.10,
+          rect.width * 0.55, rect.height * 0.55, rect.width * 0.75
+        );
+        g.addColorStop(0.0, "#f0f0f0");
+        g.addColorStop(0.25, "#cfcfcf");
+        g.addColorStop(0.55, "#9f9f9f");
+        g.addColorStop(0.78, "#d6d6d6");
+        g.addColorStop(1.0, "#8f8f8f");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, rect.width, rect.height);
+
+        // angled highlight band
+        ctx.save();
+        ctx.globalAlpha = 0.35;
+        ctx.translate(rect.width/2, rect.height/2);
+        ctx.rotate(-0.55);
+        ctx.translate(-rect.width/2, -rect.height/2);
+
+        const band = ctx.createLinearGradient(0, rect.height*0.35, rect.width, rect.height*0.65);
+        band.addColorStop(0, "rgba(255,255,255,0.0)");
+        band.addColorStop(0.5, "rgba(255,255,255,0.65)");
+        band.addColorStop(1, "rgba(255,255,255,0.0)");
+        ctx.fillStyle = band;
+        ctx.fillRect(-rect.width, rect.height*0.15, rect.width*3, rect.height*0.7);
+
+        ctx.restore();
+
+        // slight vignette edge to feel “coin-like”
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        const v = ctx.createRadialGradient(rect.width/2, rect.height/2, rect.width*0.25, rect.width/2, rect.height/2, rect.width*0.55);
+        v.addColorStop(0, "rgba(0,0,0,0)");
+        v.addColorStop(1, "rgba(0,0,0,0.55)");
+        ctx.fillStyle = v;
+        ctx.fillRect(0,0,rect.width,rect.height);
+        ctx.restore();
+      }
+
+      function drawOverlay(){
+        const rect = canvas.getBoundingClientRect();
+        ctx.globalCompositeOperation = "source-over";
+        ctx.clearRect(0,0,rect.width,rect.height);
+
+        // Draw the metallic overlay (image if available, else generated)
+        if (metalImg.complete && metalImg.naturalWidth > 0) {
+          // cover fill
+          ctx.drawImage(metalImg, 0, 0, rect.width, rect.height);
+        } else {
+          drawGeneratedMetal(rect);
+        }
+
+        // Print label on top of metal (scratches off)
+        drawLabel(rect);
+
+        // Switch into erase mode for scratching
         ctx.globalCompositeOperation = "destination-out";
 
-        // reset UI
+        // reset UI state
         revealed = false;
         revealMsg.classList.remove("show");
         progressText.textContent = "0% revealed";
@@ -235,14 +345,10 @@
 
       function estimateRevealed(){
         const rect = canvas.getBoundingClientRect();
-
-        // IMPORTANT: use the canvas pixel size for reading, but we scaled drawing to CSS pixels.
-        // Since we scaled ctx with dpr, rect.width/height correspond to CSS pixels, which matches our draw coords.
         const w = Math.floor(rect.width);
         const h = Math.floor(rect.height);
 
         const imgData = ctx.getImageData(0, 0, w, h).data;
-
         let cleared = 0;
         const total = imgData.length / 4;
 
@@ -251,8 +357,7 @@
         }
 
         const ratio = cleared / total;
-        const pct = Math.round(ratio * 100);
-        progressText.textContent = pct + "% revealed";
+        progressText.textContent = Math.round(ratio * 100) + "% revealed";
 
         if (!revealed && ratio >= REVEAL_THRESHOLD) {
           revealed = true;
@@ -261,7 +366,7 @@
       }
 
       function onDown(e){
-        if (revealed) return; // optional: stop interaction after reveal
+        if (LOCK_AFTER_REVEAL && revealed) return;
         isDown = true;
         lastPoint = getPoint(e);
         scratchDot(lastPoint);
@@ -269,11 +374,15 @@
       }
 
       function onMove(e){
-        if (!isDown || revealed) return;
+        if (!isDown) return;
+        if (LOCK_AFTER_REVEAL && revealed) return;
+
         const p = getPoint(e);
         scratchLine(lastPoint, p);
         lastPoint = p;
-        estimateRevealed(); // no randomness
+
+        // no randomness
+        estimateRevealed();
       }
 
       function onUp(){
@@ -306,8 +415,15 @@
         });
       }
 
+      // Wait for both images to settle; we can init once prize is loaded
       if (img.complete) init();
       else img.addEventListener("load", init);
+
+      // If metal loads after init, redraw overlay so it uses the PNG instead of fallback
+      metalImg.addEventListener("load", () => {
+        resizeCanvasToDisplaySize();
+        drawOverlay();
+      });
     })();
   </script>
 </body>
