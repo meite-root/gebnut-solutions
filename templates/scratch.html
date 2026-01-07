@@ -43,6 +43,23 @@
       text-align:center;
     }
 
+    .card{
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid var(--ring);
+      border-radius: 20px;
+      padding: 40px 32px;
+      box-shadow: var(--shadow);
+      margin: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .card{
+        padding: 32px 24px;
+        border-radius: 16px;
+        margin: 12px;
+      }
+    }
+
     .brand{
       letter-spacing: 0.10em;
       text-transform: uppercase;
@@ -204,41 +221,42 @@
 <body>
   <div class="bg">
     <div class="wrap">
-      <h1 class="brand">Lafayette family Pharmacy</h1>
-      <div class="subtitle">Winter Promotion</div>
-      <div class="title2">Scratch-off Game</div>
+      <div class="card">
+        <h1 class="brand">Lafayette family Pharmacy</h1>
+        <div class="subtitle">Winter Promotion</div>
+        <div class="title2">Scratch-off Game</div>
 
-      <div class="disk-area">
-        <div class="scratch-disk" aria-label="Scratch to reveal">
-          <!-- Prize image underneath -->
-          <img id="prizeImg" src="/static/scratch/prize.png" alt="Prize" />
-          <!-- Canvas overlay on top -->
-          <canvas id="scratch"></canvas>
-        </div>
-      </div>
-
-      <div id="revealMsg" class="msg">Revealed!</div>
-
-      <div class="below">
-        <div class="pill">
-          <div class="progress-bar-container">
-            <div id="progressBar" class="progress-bar-fill"></div>
+        <div class="disk-area">
+          <div class="scratch-disk" aria-label="Scratch to reveal">
+            <!-- Prize image underneath -->
+            <img id="prizeImg" src="/static/scratch/prize.png" alt="Prize" />
+            <!-- Canvas overlay on top -->
+            <canvas id="scratch"></canvas>
           </div>
         </div>
-      </div>
 
-      <div id="claimSection" class="claim-section">
-        <a href="/client/claim" class="btn btn--claim">Claim Prize</a>
-      </div>
+        <div id="revealMsg" class="msg">Revealed!</div>
 
-      <div class="links">
-        <a href="#">Rules, Terms, and Conditions</a>
-        &nbsp;&nbsp;•&nbsp;&nbsp;
-        <a href="#">Privacy</a>
-        &nbsp;&nbsp;•&nbsp;&nbsp;
-        <span>© <span id="year"></span> Geb &amp; Nut</span>
-      </div>
+        <div class="below">
+          <div class="pill">
+            <div class="progress-bar-container">
+              <div id="progressBar" class="progress-bar-fill"></div>
+            </div>
+          </div>
+        </div>
 
+        <div id="claimSection" class="claim-section">
+          <a href="/client/claim" class="btn btn--claim">Claim Prize</a>
+        </div>
+
+        <div class="links">
+          <a href="#">Rules, Terms, and Conditions</a>
+          &nbsp;&nbsp;•&nbsp;&nbsp;
+          <a href="#">Privacy</a>
+          &nbsp;&nbsp;•&nbsp;&nbsp;
+          <span>© <span id="year"></span> Geb &amp; Nut</span>
+        </div>
+      </div>
     </div>
   </div>
 

@@ -45,6 +45,23 @@
       text-align: center;
     }
 
+    .card{
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid var(--ring);
+      border-radius: 20px;
+      padding: 40px 32px;
+      box-shadow: var(--shadow);
+      margin: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .card{
+        padding: 32px 24px;
+        border-radius: 16px;
+        margin: 12px;
+      }
+    }
+
     .title{
       color: var(--text);
       font-size: 28px;
@@ -148,49 +165,51 @@
 <body>
   <div class="bg">
     <div class="wrap">
-      <h1 class="title">Winner Prize Claim Form</h1>
+      <div class="card">
+        <h1 class="title">Winner Prize Claim Form</h1>
 
-      <div class="prize-info">
-        <div><strong>Description:</strong> TOYOTA CAR</div>
-        <div><strong>Claim:</strong> <span id="claimCode">VM5V59p4vezR</span></div>
-        <div><strong>Date:</strong> <span id="claimDate"></span></div>
-        <div><strong>Time:</strong> <span id="claimTime"></span></div>
-      </div>
+        <div class="prize-info">
+          <div><strong>Description:</strong> TOYOTA CAR</div>
+          <div><strong>Claim:</strong> <span id="claimCode">VM5V59p4vezR</span></div>
+          <div><strong>Date:</strong> <span id="claimDate"></span></div>
+          <div><strong>Time:</strong> <span id="claimTime"></span></div>
+        </div>
 
-      <div class="validation-notice">
-        Prize must be submitted for validation by the date below or will be forfeited...
-      </div>
+        <div class="validation-notice">
+          Prize must be submitted for validation by the date below or will be forfeited...
+        </div>
 
-      <div class="deadline">
-        Deadline: <span id="deadline"></span>
-      </div>
+        <div class="deadline">
+          Deadline: <span id="deadline"></span>
+        </div>
 
-      <div class="form-section">
-        <div class="form-title">Prize claim form:</div>
-        
-        <form id="claimForm" onsubmit="handleSubmit(event)">
-          <div class="form-group">
-            <input 
-              type="text" 
-              class="form-input" 
-              placeholder="First Name" 
-              id="firstName"
-              required
-            />
-          </div>
+        <div class="form-section">
+          <div class="form-title">Prize claim form:</div>
           
-          <div class="form-group">
-            <input 
-              type="email" 
-              class="form-input" 
-              placeholder="Email" 
-              id="email"
-              required
-            />
-          </div>
+          <form id="claimForm" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+              <input 
+                type="text" 
+                class="form-input" 
+                placeholder="First Name" 
+                id="firstName"
+                required
+              />
+            </div>
+            
+            <div class="form-group">
+              <input 
+                type="email" 
+                class="form-input" 
+                placeholder="Email" 
+                id="email"
+                required
+              />
+            </div>
 
-          <button type="submit" class="claim-btn">Claim Prize</button>
-        </form>
+            <button type="submit" class="claim-btn">Claim Prize</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
