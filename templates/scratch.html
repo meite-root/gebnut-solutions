@@ -186,9 +186,9 @@
 <body>
   <div class="bg">
     <div class="wrap">
-      <h1 class="brand">CLIENT NAME</h1>
-      <div class="subtitle">Customer engagement</div>
-      <div class="title2">Scratch-off game</div>
+      <h1 class="brand">Lafayette family Pharmacy</h1>
+      <div class="subtitle">Winter Promotion</div>
+      <div class="title2">Scratch-off Game</div>
 
       <div class="disk-area">
         <div class="scratch-disk" aria-label="Scratch to reveal">
@@ -200,12 +200,6 @@
       </div>
 
       <div id="revealMsg" class="msg">Revealed!</div>
-
-      <div class="below">
-        <div class="pill">
-          <span id="progressText">0% revealed</span>
-        </div>
-      </div>
 
       <div id="claimSection" class="claim-section">
         <a href="/client/claim" class="btn btn--claim">Claim Prize</a>
@@ -226,7 +220,6 @@
     (function(){
       const canvas = document.getElementById("scratch");
       const img = document.getElementById("prizeImg");
-      const progressText = document.getElementById("progressText");
       const revealMsg = document.getElementById("revealMsg");
       const claimSection = document.getElementById("claimSection");
 
@@ -367,7 +360,6 @@
         revealTime = null;
         revealMsg.classList.remove("show");
         claimSection.classList.remove("show");
-        progressText.textContent = "0% revealed";
       }
 
       function getPoint(e){
@@ -408,7 +400,6 @@
         }
 
         const ratio = cleared / total;
-        progressText.textContent = Math.round(ratio * 100) + "% revealed";
 
         if (!revealed && ratio >= REVEAL_THRESHOLD) {
           revealed = true;
