@@ -130,6 +130,24 @@
       box-shadow: 0 12px 25px rgba(0,0,0,0.25);
     }
 
+    .progress-bar-container{
+      width: 200px;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill{
+      height: 100%;
+      background: linear-gradient(90deg, #4ade80, #5ee88f);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+      width: 0%;
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+    }
+
     .btn{
       padding: 10px 14px;
       border-radius: 999px;
@@ -201,6 +219,14 @@
 
       <div id="revealMsg" class="msg">Revealed!</div>
 
+      <div class="below">
+        <div class="pill">
+          <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
       <div id="claimSection" class="claim-section">
         <a href="/client/claim" class="btn btn--claim">Claim Prize</a>
       </div>
@@ -220,6 +246,7 @@
     (function(){
       const canvas = document.getElementById("scratch");
       const img = document.getElementById("prizeImg");
+      const progressBar = document.getElementById("progressBar");
       const revealMsg = document.getElementById("revealMsg");
       const claimSection = document.getElementById("claimSection");
 
@@ -360,6 +387,7 @@
         revealTime = null;
         revealMsg.classList.remove("show");
         claimSection.classList.remove("show");
+        progressBar.style.width = "0%";
       }
 
       function getPoint(e){
@@ -400,6 +428,7 @@
         }
 
         const ratio = cleared / total;
+        progressBar.style.width = (ratio * 100) + "%";
 
         if (!revealed && ratio >= REVEAL_THRESHOLD) {
           revealed = true;
