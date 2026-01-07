@@ -182,7 +182,6 @@
         <div class="pill">
           <span id="progressText">0% revealed</span>
         </div>
-        <button class="btn" id="resetBtn" type="button">Reset</button>
       </div>
 
       <div class="links">
@@ -200,7 +199,6 @@
     (function(){
       const canvas = document.getElementById("scratch");
       const img = document.getElementById("prizeImg");
-      const resetBtn = document.getElementById("resetBtn");
       const progressText = document.getElementById("progressText");
       const revealMsg = document.getElementById("revealMsg");
 
@@ -406,11 +404,6 @@
         canvas.addEventListener("touchstart", (e) => { e.preventDefault(); onDown(e); }, { passive:false });
         canvas.addEventListener("touchmove", (e) => { e.preventDefault(); onMove(e); }, { passive:false });
         canvas.addEventListener("touchend", (e) => { e.preventDefault(); onUp(e); }, { passive:false });
-
-        resetBtn.addEventListener("click", () => {
-          resizeCanvasToDisplaySize();
-          drawOverlay();
-        });
 
         window.addEventListener("resize", () => {
           resizeCanvasToDisplaySize();
