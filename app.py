@@ -10,5 +10,9 @@ def home():
 def client_scratch():
     return render_template("scratch.html")
 
+@app.get("/client/claim")
+def claim_prize():
+    return render_template("claim.html")
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

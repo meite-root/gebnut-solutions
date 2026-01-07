@@ -139,8 +139,31 @@
       cursor: pointer;
       font-weight: 650;
       letter-spacing: 0.02em;
+      text-decoration: none;
+      display: inline-block;
     }
     .btn:hover{ background: rgba(255,255,255,0.14); }
+
+    .btn--claim{
+      background: #4ade80;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.30);
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 20px;
+      box-shadow: 0 8px 20px rgba(74, 222, 128, 0.3);
+    }
+    .btn--claim:hover{ 
+      background: #5ee88f;
+      box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
+    }
+
+    .claim-section{
+      margin-top: 24px;
+      display: none;
+    }
+    .claim-section.show{ display: block; }
 
     .msg{
       margin-top: 14px;
@@ -184,6 +207,10 @@
         </div>
       </div>
 
+      <div id="claimSection" class="claim-section">
+        <a href="/client/claim" class="btn btn--claim">Claim Prize</a>
+      </div>
+
       <div class="links">
         <a href="#">Rules, Terms, and Conditions</a>
         &nbsp;&nbsp;•&nbsp;&nbsp;
@@ -201,6 +228,7 @@
       const img = document.getElementById("prizeImg");
       const progressText = document.getElementById("progressText");
       const revealMsg = document.getElementById("revealMsg");
+      const claimSection = document.getElementById("claimSection");
 
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
@@ -208,6 +236,7 @@
       const BRUSH_RADIUS = 22;        // scratch size
       const REVEAL_THRESHOLD = 0.61;  // 60%
       const LOCK_AFTER_REVEAL = true; // set false if you want scratching to continue
+      const CLAIM_DEADLINE_HOURS = 72; // 72 hours from reveal
 
       // ===== overlay asset (Option A) =====
       const METAL_IMAGE_URL = "/static/scratch/metal.png";
@@ -217,6 +246,25 @@
       let isDown = false;
       let lastPoint = null;
       let revealed = false;
+      let revealTime = null;
+
+      // Check if claim button should be shown
+      function checkClaimAvailability() {
+        if (!revealTime) return false;
+        
+        const now = new Date();
+        const deadline = new Date(revealTime.getTime() + (CLAIM_DEADLINE_HOURS * 60 * 60 * 1000));
+        
+        return now < deadline;
+      }
+
+      function updateClaimButton() {
+        if (revealed && checkClaimAvailability()) {
+          claimSection.classList.add("show");
+        } else {
+          claimSection.classList.remove("show");
+        }
+      }
 
       function resizeCanvasToDisplaySize(){
         const rect = canvas.getBoundingClientRect();
@@ -316,7 +364,9 @@
 
         // reset UI state
         revealed = false;
+        revealTime = null;
         revealMsg.classList.remove("show");
+        claimSection.classList.remove("show");
         progressText.textContent = "0% revealed";
       }
 
@@ -362,7 +412,12 @@
 
         if (!revealed && ratio >= REVEAL_THRESHOLD) {
           revealed = true;
+          revealTime = new Date();
           revealMsg.classList.add("show");
+          updateClaimButton();
+          
+          // Store reveal time in localStorage for persistence
+          localStorage.setItem('revealTime', revealTime.toISOString());
         }
       }
 
@@ -397,6 +452,15 @@
         resizeCanvasToDisplaySize();
         drawOverlay();
 
+        // Check for stored reveal time
+        const storedRevealTime = localStorage.getItem('revealTime');
+        if (storedRevealTime) {
+          revealTime = new Date(storedRevealTime);
+          revealed = true;
+          revealMsg.classList.add("show");
+          updateClaimButton();
+        }
+
         canvas.addEventListener("mousedown", onDown);
         window.addEventListener("mousemove", onMove);
         window.addEventListener("mouseup", onUp);
@@ -409,6 +473,9 @@
           resizeCanvasToDisplaySize();
           drawOverlay();
         });
+
+        // Periodically check if claim deadline has passed
+        setInterval(updateClaimButton, 60000); // Check every minute
       }
 
       // Wait for both images to settle; we can init once prize is loaded

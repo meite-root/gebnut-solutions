@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Winner Prize Claim Form</title>
+
+  <style>
+    :root{
+      --bg: #2a0b12;
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.72);
+      --shadow: 0 18px 55px rgba(0,0,0,0.55);
+      --ring: rgba(255,255,255,0.18);
+      --purple: #a855f7;
+      --green: #4ade80;
+    }
+    *{ box-sizing:border-box; }
+    html,body{
+      margin:0; padding:0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    /* Same background as scratch.html */
+    .bg{
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 25% 10%, rgba(255,255,255,0.07), transparent 40%),
+        radial-gradient(circle at 70% 30%, rgba(255,255,255,0.06), transparent 45%),
+        repeating-linear-gradient(45deg,
+          rgba(255,255,255,0.04) 0px,
+          rgba(255,255,255,0.04) 12px,
+          rgba(0,0,0,0.00) 12px,
+          rgba(0,0,0,0.00) 28px
+        ),
+        linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.20));
+      padding: 40px 18px;
+    }
+
+    .wrap{
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .title{
+      color: var(--purple);
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 30px;
+      letter-spacing: 0.02em;
+    }
+
+    .prize-info{
+      color: var(--purple);
+      font-size: 16px;
+      line-height: 1.8;
+      margin: 0 0 20px;
+      text-align: left;
+    }
+
+    .prize-info div{
+      margin: 8px 0;
+    }
+
+    .validation-notice{
+      color: var(--purple);
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .deadline{
+      color: var(--purple);
+      font-size: 16px;
+      font-weight: 600;
+      margin: 10px 0 30px;
+      text-align: left;
+    }
+
+    .form-section{
+      text-align: left;
+      margin: 30px 0;
+    }
+
+    .form-title{
+      color: var(--purple);
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 20px;
+    }
+
+    .form-group{
+      margin: 0 0 20px;
+    }
+
+    .form-input{
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      background: white;
+      color: #333;
+      font-size: 16px;
+      font-family: inherit;
+    }
+
+    .form-input::placeholder{
+      color: #999;
+    }
+
+    .form-input:focus{
+      outline: none;
+      border-color: #9333ea;
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+    }
+
+    .claim-btn{
+      width: 100%;
+      padding: 16px 24px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 8px 20px rgba(74, 222, 128, 0.3);
+      transition: all 0.2s;
+    }
+
+    .claim-btn:hover{
+      background: #5ee88f;
+      box-shadow: 0 10px 25px rgba(74, 222, 128, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .claim-btn:active{
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="wrap">
+      <h1 class="title">Winner Prize Claim Form</h1>
+
+      <div class="prize-info">
+        <div><strong>Description:</strong> TOYOTA CAR</div>
+        <div><strong>Claim:</strong> <span id="claimCode">VM5V59p4vezR</span></div>
+        <div><strong>Date:</strong> <span id="claimDate"></span></div>
+        <div><strong>Time:</strong> <span id="claimTime"></span></div>
+      </div>
+
+      <div class="validation-notice">
+        Prize must be submitted for validation by the date below or will be forfeited...
+      </div>
+
+      <div class="deadline">
+        Deadline: <span id="deadline"></span>
+      </div>
+
+      <div class="form-section">
+        <div class="form-title">Prize claim form:</div>
+        
+        <form id="claimForm" onsubmit="handleSubmit(event)">
+          <div class="form-group">
+            <input 
+              type="text" 
+              class="form-input" 
+              placeholder="First Name" 
+              id="firstName"
+              required
+            />
+          </div>
+          
+          <div class="form-group">
+            <input 
+              type="email" 
+              class="form-input" 
+              placeholder="Email" 
+              id="email"
+              required
+            />
+          </div>
+
+          <button type="submit" class="claim-btn">Claim Prize</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get reveal time from localStorage
+    const storedRevealTime = localStorage.getItem('revealTime');
+    
+    if (storedRevealTime) {
+      const revealTime = new Date(storedRevealTime);
+      const deadline = new Date(revealTime.getTime() + (72 * 60 * 60 * 1000));
+      
+      // Format date
+      const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+      const timeOptions = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+      
+      document.getElementById('claimDate').textContent = revealTime.toLocaleDateString('en-US', dateOptions);
+      document.getElementById('claimTime').textContent = revealTime.toLocaleTimeString('en-US', timeOptions);
+      document.getElementById('deadline').textContent = deadline.toLocaleString('en-US', {
+        ...dateOptions,
+        ...timeOptions
+      });
+    } else {
+      // Fallback if no reveal time found
+      const now = new Date();
+      const deadline = new Date(now.getTime() + (72 * 60 * 60 * 1000));
+      
+      document.getElementById('claimDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      document.getElementById('claimTime').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+      document.getElementById('deadline').textContent = deadline.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value;
+      const email = document.getElementById('email').value;
+      
+      // Here you would typically send this data to your backend
+      console.log('Claim submitted:', { firstName, email });
+      
+      // For now, just show an alert
+      alert('Prize claim submitted! We will contact you soon.');
+      
+      // Optionally redirect or show success message
+      // window.location.href = '/client/scratch';
+    }
+  </script>
+</body>
+</html>
